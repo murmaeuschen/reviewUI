@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Reviews</title>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+  <body>
+    <div id="container"></div>   
+    <script type="text/babel">
+      var data = [
+            { productID: 'Alpen-Panorama_im_Heissluftballon',
+              ratingID: '20070301', 
+              examiner: 'Lisa',  
+              residence: 'Augsburg',                                
+              creationDate  : "03/01/2007",
+              lastModified  : '05/01/2007',             
+              online : true                       
+            },
+
+            { productID: 'House-Running-Berlin',
+              ratingID: '20131029', 
+              examiner: 'Stephanie',  
+              residence: 'Bremen',                                
+              creationDate  : "03/01/2008",
+              lastModified  : '05/01/2008',             
+              online : true                       
+            },
+
+            { productID: 'Hummer-Offroad',
+              ratingID: '20091021', 
+              examiner: 'Heiko',  
+              residence: 'Thiersheim',                                
+              creationDate  : "03/01/2009",
+              lastModified  : '05/01/2009',             
+              online : false                       
+            }
+      ];   
+      
+      var TheadRow = React.createClass({          
+          render: function() {
+            return( <thead>
+                      <tr>                        
+                        <th>ratingID</th>
+                        <th>productID</th>
+                        <th>Berichterstatter</th>
+                        <th>Ort</th>
+                        <th>Creation Date</th>
+                        <th>Last Modified</th>
+                        <th>Online</th>                       
+                      </tr>
+                    </thead>);
+          }
+      });      
+
+      var ReviewRow = React.createClass({   
+          handleClick: function(e){
+            e.preventDefault();
+            console.log('handleClick');    
+            this.props.onChangeStatus();
+          },
+
+          render: function() {            
+            return( <tr>                       
+                        <td><a href="#" onClick={this.handleClick}>{this.props.review.ratingID}</a></td> 
+                        <td>{this.props.review.productID}</td>
+                        <td>{this.props.review.examiner}</td>
+                        <td>{this.props.review.residence}</td>
+                        <td>{this.props.review.creationDate}</td>
+                        <td>{this.props.review.lastModified}</td>                       
+                        <td>{this.props.review.online.toString()}</td>                      
+                    </tr>);
+          }
+      });      
+
+      var ReviewsTable = React.createClass({
+          handleStatusChange: function(){
+              console.log("handleStatusChange");
+              this.props.onHrefClick('visible');
+          },
+          
+          render: function() {
+            var rows = [];
+
+            var handleStatusChange = this.handleStatusChange;
+          
+            this.props.data.forEach(function(review) {                
+                rows.push(<ReviewRow review={review} key={review.ratingID} onChangeStatus = {handleStatusChange} />);                
+            });
+
+            return(<div className="row">
+                    <div className="col-md-12">
+                      <table className="table" id="table">
+                        <TheadRow />
+                        <tbody>
+                          {rows}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>);
+          }
+      });
+
+      var ReviewForm = React.createClass({   
+          handleSubmit: function(e) {
+            e.preventDefault();
+            console.log('handleSubmit');     
+            this.props.onChangeStatus('invisible');       
+          },       
+          render: function() {           
+            return(
+            <div className="row">
+              <div className="col-md-12">
+                <div className={this.props.reviewFormVisibility}>
+                  <h1 className="page-header">Detailseite</h1>
+                  <form onSubmit={this.handleSubmit}>
+                    <input type="Submit" value="Save" />
+                  </form>
+                 </div>
+              </div>
+            </div>)            
+          }
+      });
+
+      var Reviews = React.createClass({  
+          getInitialState: function() {
+            return {
+                    reviewFormVisibility: "invisible"
+                };
+          },
+
+          handleVisibilityChange: function(status) {
+              console.log('handleVisibilityChange');
+              this.setState({
+                  reviewFormVisibility: status
+              });
+          },
+        
+          render: function() {
+            return(             
+              <div className="container">
+                <div className="row">
+                  <div className="col-md-12">
+                    <h1 className="page-header">Reviews</h1>
+                  </div>
+                </div>
+                <ReviewsTable data= {this.props.data} onHrefClick={this.handleVisibilityChange} />
+                <ReviewForm reviewFormVisibility = {this.state.reviewFormVisibility} onChangeStatus={this.handleVisibilityChange} />
+              </div>
+            );
+          }
+      });
+
+      ReactDOM.render(
+        <Reviews data = {data} />,
+        document.getElementById('container')
+      );
+    </script>
+  </body>
+</html>
